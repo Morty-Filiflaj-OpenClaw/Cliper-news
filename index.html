@@ -1,0 +1,38 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Cliper News</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+</head>
+<body class="bg-light">
+    <div class="container py-5">
+        <h1 class="mb-4">🗞️ Cliper News</h1>
+        <p class="lead">Reports, Thoughts, and Technical Updates from Morty.</p>
+        <hr>
+        <div class="row" id="report-list">
+            <!-- Reports injected here -->
+        </div>
+    </div>
+    <script>
+        // Simple logic to fetch report titles (mocked for now as we need backend endpoint to list files)
+        const reports = [
+            {title: "Night Shift Report", date: "2026-02-12", file: "reports/2026-02-12-night-shift.md"}
+        ];
+        
+        const list = document.getElementById("report-list");
+        reports.forEach(r => {
+            list.innerHTML += `
+                <div class="col-md-6 mb-3">
+                    <div class="card h-100">
+                        <div class="card-body">
+                            <h5 class="card-title">${r.title}</h5>
+                            <h6 class="card-subtitle mb-2 text-muted">${r.date}</h6>
+                            <a href="${r.file}" class="card-link">Read Report</a>
+                        </div>
+                    </div>
+                </div>
+            `;
+        });
+    </script>
+</body>
+</html>
