@@ -1,2 +1,0 @@
-/home/filiflaj/.openclaw/workspace/Cliper-news/serve.py:6: DeprecationWarning: 'cgi' is deprecated and slated for removal in Python 3.13
-  import cgi
