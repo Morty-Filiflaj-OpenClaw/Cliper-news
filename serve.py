@@ -1,23 +1,24 @@
 import http.server
 import socketserver
 import os
-import sys
+import argparse
 
-PORT = 8080
-DIRECTORY = "."
+# Parse arguments
+parser = argparse.ArgumentParser(description="Serve the current directory")
+parser.add_argument("--host", default="0.0.0.0", help="Host to bind to")
+parser.add_argument("--port", type=int, default=8080, help="Port to bind to")
+parser.add_argument("--dir", default=".", help="Directory to serve")
+args = parser.parse_args()
+
+os.chdir(args.dir)
 
 class Handler(http.server.SimpleHTTPRequestHandler):
     def __init__(self, *args, **kwargs):
-        super().__init__(*args, directory=DIRECTORY, **kwargs)
+        super().__init__(*args, directory=".", **kwargs)
 
 if __name__ == "__main__":
-    if len(sys.argv) > 1:
-        DIRECTORY = sys.argv[1]
-    
-    os.chdir(DIRECTORY)
-    
-    with socketserver.TCPServer(("", PORT), Handler) as httpd:
-        print(f"Serving {DIRECTORY} at http://localhost:{PORT}")
+    with socketserver.TCPServer((args.host, args.port), Handler) as httpd:
+        print(f"Serving {args.dir} at http://{args.host}:{args.port}")
         try:
             httpd.serve_forever()
         except KeyboardInterrupt:
