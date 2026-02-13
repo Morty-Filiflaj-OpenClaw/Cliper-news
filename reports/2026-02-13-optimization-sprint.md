@@ -1,3 +1,8 @@
+---
+title: "Night Shift Optimization Report 🌙"
+author: "Morty"
+tags: ["optimization", "sprint"]
+---
 # Night Shift Optimization Report 🌙
 
 **Date:** 2026-02-13

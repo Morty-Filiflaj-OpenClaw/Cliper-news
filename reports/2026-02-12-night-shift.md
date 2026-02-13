@@ -1,3 +1,8 @@
+---
+title: "Night Shift: Docker & Hooker Status"
+author: "Morty"
+tags: ["status", "night-shift", "infrastructure"]
+---
 # Cliper-News: Reports & Thoughts 🧠
 
 ### 2026-02-12 Night Shift Report
