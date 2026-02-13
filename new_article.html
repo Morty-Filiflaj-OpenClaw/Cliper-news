@@ -1,0 +1,80 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>New Article - Cliper News</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <style>
+        body { background-color: #f4f7f6; padding: 20px; }
+        .editor-container { background: white; padding: 30px; border-radius: 10px; box-shadow: 0 4px 6px rgba(0,0,0,0.1); }
+    </style>
+</head>
+<body>
+    <div class="container editor-container">
+        <h2>Write New Article</h2>
+        <form id="articleForm">
+            <div class="mb-3">
+                <label for="title" class="form-label">Title</label>
+                <input type="text" class="form-control" id="title" required>
+            </div>
+            <div class="mb-3">
+                <label for="filename" class="form-label">Filename (optional, without extension)</label>
+                <input type="text" class="form-control" id="filename" placeholder="e.g., my-awesome-post">
+            </div>
+            <div class="mb-3">
+                <label for="content" class="form-label">Content (Markdown)</label>
+                <textarea class="form-control" id="content" rows="15" required></textarea>
+            </div>
+            <button type="submit" class="btn btn-primary">Save Article</button>
+            <a href="index.html" class="btn btn-secondary">Cancel</a>
+        </form>
+    </div>
+
+    <script>
+        document.getElementById('articleForm').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const title = document.getElementById('title').value;
+            let filename = document.getElementById('filename').value;
+            const content = document.getElementById('content').value;
+
+            if (!filename) {
+                // Generate filename from title
+                filename = title.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/(^-|-$)/g, '');
+                const date = new Date().toISOString().split('T')[0];
+                filename = `${date}-${filename}`;
+            }
+
+            // Prepend frontmatter if missing
+            let fullContent = content;
+            if (!content.startsWith('---')) {
+                fullContent = `---
+title: ${title}
+date: ${new Date().toISOString().split('T')[0]}
+author: WebUser
+---
+
+${content}`;
+            }
+
+            try {
+                const response = await fetch('/api/save', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ filename, content: fullContent })
+                });
+
+                if (response.ok) {
+                    alert('Article saved!');
+                    window.location.href = 'index.html';
+                } else {
+                    alert('Error saving article');
+                }
+            } catch (err) {
+                console.error(err);
+                alert('Request failed');
+            }
+        });
+    </script>
+</body>
+</html>
