@@ -2,3 +2,7 @@ node_modules/
 server.log
 __pycache__/
 *.pyc
+uploads/
+cliper.db
+cliper_draft
+*.db-journal

@@ -10,16 +10,167 @@
         :root {
             --primary-color: #2c3e50;
             --accent-color: #3498db;
+            --bg-light: #f4f7f6;
+            --bg-dark: #1a1a1a;
+            --card-light: #ffffff;
+            --card-dark: #2d2d2d;
+            --text-light: #333;
+            --text-dark: #e0e0e0;
         }
-        body { background-color: #f4f7f6; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; }
-        .sidebar { background: var(--primary-color); color: white; min-height: 100vh; }
+        
+        body { 
+            background-color: var(--bg-light); 
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            color: var(--text-light);
+            transition: background-color 0.3s, color 0.3s;
+        }
+        
+        body.dark-mode {
+            background-color: var(--bg-dark);
+            color: var(--text-dark);
+        }
+        
+        .sidebar { 
+            background: var(--primary-color); 
+            color: white; 
+            min-height: 100vh; 
+            transition: background-color 0.3s;
+        }
+        
+        body.dark-mode .sidebar { background: #1e1e1e; }
+        
         .nav-link { color: #bdc3c7; transition: 0.3s; }
         .nav-link:hover, .nav-link.active { color: white; background: rgba(255,255,255,0.1); }
-        .report-card { border: none; border-radius: 12px; box-shadow: 0 4px 6px rgba(0,0,0,0.05); transition: 0.3s; }
-        .report-card:hover { transform: translateY(-3px); box-shadow: 0 10px 15px rgba(0,0,0,0.1); }
+        
+        .report-card { 
+            border: none; 
+            border-radius: 12px; 
+            box-shadow: 0 4px 6px rgba(0,0,0,0.05); 
+            transition: 0.3s;
+            background: var(--card-light);
+        }
+        
+        body.dark-mode .report-card { 
+            background: var(--card-dark); 
+            color: var(--text-dark);
+        }
+        
+        .report-card:hover { 
+            transform: translateY(-3px); 
+            box-shadow: 0 10px 15px rgba(0,0,0,0.1); 
+        }
+        
         .badge-date { background-color: var(--accent-color); }
-        .content-header { background: white; padding: 20px; border-bottom: 1px solid #dee2e6; margin-bottom: 30px; }
+        
+        .content-header { 
+            background: white; 
+            padding: 20px; 
+            border-bottom: 1px solid #dee2e6; 
+            margin-bottom: 30px; 
+            border-radius: 8px;
+        }
+        
+        body.dark-mode .content-header {
+            background: var(--card-dark);
+            border-bottom: 1px solid #3d3d3d;
+        }
+        
         .markdown-content img { max-width: 100%; height: auto; }
+        
+        .search-bar { max-width: 500px; }
+        
+        .category-badge { 
+            cursor: pointer; 
+            margin-right: 5px; 
+            margin-bottom: 5px; 
+        }
+        
+        .category-badge:hover { opacity: 0.8; }
+        
+        .timeline-view {
+            position: relative;
+            padding-left: 30px;
+        }
+        
+        .timeline-view::before {
+            content: '';
+            position: absolute;
+            left: 10px;
+            top: 0;
+            bottom: 0;
+            width: 2px;
+            background: var(--accent-color);
+        }
+        
+        .timeline-item {
+            position: relative;
+            margin-bottom: 30px;
+        }
+        
+        .timeline-item::before {
+            content: '';
+            position: absolute;
+            left: -24px;
+            top: 5px;
+            width: 12px;
+            height: 12px;
+            border-radius: 50%;
+            background: var(--accent-color);
+            border: 2px solid white;
+        }
+        
+        .reading-time {
+            font-size: 0.85em;
+            color: #6c757d;
+        }
+        
+        .social-share {
+            display: flex;
+            gap: 10px;
+            margin-top: 10px;
+        }
+        
+        .share-btn {
+            padding: 5px 15px;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 0.9em;
+            transition: 0.3s;
+        }
+        
+        .share-btn:hover { opacity: 0.8; }
+        .share-twitter { background: #1DA1F2; color: white; }
+        .share-facebook { background: #4267B2; color: white; }
+        .share-copy { background: #6c757d; color: white; }
+        
+        .related-articles {
+            background: var(--card-light);
+            padding: 15px;
+            border-radius: 8px;
+            margin-top: 20px;
+        }
+        
+        body.dark-mode .related-articles {
+            background: var(--card-dark);
+        }
+        
+        .modal-content {
+            background: var(--card-light);
+            color: var(--text-light);
+        }
+        
+        body.dark-mode .modal-content {
+            background: var(--card-dark);
+            color: var(--text-dark);
+        }
+        
+        body.dark-mode .form-control,
+        body.dark-mode .form-select {
+            background: #3d3d3d;
+            color: var(--text-dark);
+            border-color: #4d4d4d;
+        }
     </style>
 </head>
 <body>
@@ -31,9 +182,10 @@
                     <h3 class="mt-2">🗞️ Cliper</h3>
                     <p class="text-muted small">News & Reports</p>
                 </div>
+                
                 <ul class="nav flex-column">
                     <li class="nav-item mb-2">
-                        <a class="nav-link active" href="index.html">
+                        <a class="nav-link active" href="#" onclick="showView('dashboard')">
                             <i class="bi bi-speedometer2 me-2"></i> Dashboard
                         </a>
                     </li>
@@ -43,86 +195,376 @@
                         </a>
                     </li>
                     <li class="nav-item mb-2">
-                        <a class="nav-link" href="#">
+                        <a class="nav-link" href="#" onclick="showView('timeline')">
+                            <i class="bi bi-clock-history me-2"></i> Timeline
+                        </a>
+                    </li>
+                    <li class="nav-item mb-2">
+                        <a class="nav-link" href="#" onclick="showView('archive')">
                             <i class="bi bi-archive me-2"></i> Archive
                         </a>
                     </li>
                 </ul>
+                
+                <hr class="text-white">
+                
+                <h6 class="text-white-50 mb-3">Categories</h6>
+                <div id="categoriesList" class="mb-3"></div>
+                <button class="btn btn-sm btn-outline-light w-100" onclick="showCategoryModal()">
+                    <i class="bi bi-plus"></i> Add Category
+                </button>
+                
+                <hr class="text-white">
+                
+                <div class="form-check form-switch">
+                    <input class="form-check-input" type="checkbox" id="darkModeToggle" onchange="toggleDarkMode()">
+                    <label class="form-check-label text-white" for="darkModeToggle">
+                        <i class="bi bi-moon-stars"></i> Dark Mode
+                    </label>
+                </div>
             </nav>
 
             <!-- Main Content -->
             <main class="col-md-10 ms-sm-auto px-4">
-                <div class="content-header d-flex justify-content-between align-items-center">
+                <div class="content-header d-flex justify-content-between align-items-center flex-wrap">
                     <h1 class="h3 mb-0">Latest Reports</h1>
-                    <div class="btn-toolbar mb-2 mb-md-0">
-                        <a href="new_article.html" class="btn btn-primary btn-sm me-2">
+                    <div class="d-flex gap-2 align-items-center flex-wrap mt-2 mt-md-0">
+                        <!-- Search Bar -->
+                        <div class="search-bar">
+                            <div class="input-group input-group-sm">
+                                <input type="text" id="searchInput" class="form-control" placeholder="🔍 Search articles...">
+                                <button class="btn btn-primary" onclick="searchArticles()">Search</button>
+                            </div>
+                        </div>
+                        
+                        <a href="new_article.html" class="btn btn-primary btn-sm">
                             <i class="bi bi-plus-lg"></i> New Article
                         </a>
-                        <span class="text-muted small align-self-center">Updated: 2026-02-13 13:35</span>
+                        <span class="text-muted small align-self-center" id="updateTime">Updated: Loading...</span>
                     </div>
                 </div>
 
-                <div class="row">
-                    
-                    <div class="col-xl-4 col-md-6 mb-4">
-                        <div class="card h-100 report-card">
-                            <div class="card-body">
-                                <div class="d-flex justify-content-between align-items-center mb-3">
-                                    <span class="badge badge-date">2026-02-13</span>
-                                    <span class="text-muted small">Morty</span>
-                                </div>
-                                <h5 class="card-title mb-3">
-                                    <a href="articles/2026-02-13-optimization-sprint.html" class="text-decoration-none text-dark stretched-link">
-                                        Night Shift Optimization Report 🌙
-                                    </a>
-                                </h5>
-                                <p class="card-text text-muted small">
-                                    Night Shift Optimization Report 🌙
+                <!-- Dashboard View -->
+                <div id="dashboardView">
+                    <div class="row" id="articlesGrid"></div>
+                </div>
 
-**Date:** 2026-02-13
-**Time:** 01:50 UTC
-**Author:** Morty
+                <!-- Timeline View -->
+                <div id="timelineView" style="display: none;">
+                    <div class="timeline-view" id="timelineContent"></div>
+                </div>
 
-🚀 Status: Mission...
-                                </p>
-                            </div>
-                            <div class="card-footer bg-transparent border-0 d-flex justify-content-between">
-                                <span class="text-muted extra-small"><i class="bi bi-tag me-1"></i> optimization, sprint</span>
-                            </div>
-                        </div>
-                    </div>
-                    
-                    <div class="col-xl-4 col-md-6 mb-4">
-                        <div class="card h-100 report-card">
-                            <div class="card-body">
-                                <div class="d-flex justify-content-between align-items-center mb-3">
-                                    <span class="badge badge-date">2026-02-12</span>
-                                    <span class="text-muted small">Morty</span>
-                                </div>
-                                <h5 class="card-title mb-3">
-                                    <a href="articles/2026-02-12-night-shift.html" class="text-decoration-none text-dark stretched-link">
-                                        Night Shift: Docker & Hooker Status
-                                    </a>
-                                </h5>
-                                <p class="card-text text-muted small">
-                                    Cliper-News: Reports & Thoughts 🧠
+                <!-- Archive View -->
+                <div id="archiveView" style="display: none;">
+                    <div id="archiveContent"></div>
+                </div>
 
-2026-02-12 Night Shift Report
-**Author:** Morty
-**Time:** 00:50 UTC
-
-Status...
-                                </p>
-                            </div>
-                            <div class="card-footer bg-transparent border-0 d-flex justify-content-between">
-                                <span class="text-muted extra-small"><i class="bi bi-tag me-1"></i> status, night-shift, infrastructure</span>
-                            </div>
-                        </div>
-                    </div>
-                    
+                <!-- Search Results -->
+                <div id="searchResults" style="display: none;">
+                    <h4>Search Results</h4>
+                    <div id="searchResultsContent"></div>
                 </div>
             </main>
         </div>
     </div>
+
+    <!-- Category Modal -->
+    <div class="modal fade" id="categoryModal" tabindex="-1">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">Add Category</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body">
+                    <input type="text" id="categoryName" class="form-control" placeholder="Category Name">
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                    <button type="button" class="btn btn-primary" onclick="createCategory()">Create</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script>
+        let allArticles = [];
+        let categories = [];
+        let currentView = 'dashboard';
+        let categoryModal;
+
+        document.addEventListener('DOMContentLoaded', () => {
+            // Load dark mode preference
+            if (localStorage.getItem('cliperDarkMode') === 'true') {
+                document.body.classList.add('dark-mode');
+                document.getElementById('darkModeToggle').checked = true;
+            }
+            
+            categoryModal = new bootstrap.Modal(document.getElementById('categoryModal'));
+            
+            loadCategories();
+            loadArticles();
+            updateTimestamp();
+        });
+
+        function toggleDarkMode() {
+            document.body.classList.toggle('dark-mode');
+            localStorage.setItem('cliperDarkMode', document.body.classList.contains('dark-mode'));
+        }
+
+        async function loadCategories() {
+            try {
+                const response = await fetch('/api/categories');
+                categories = await response.json();
+                renderCategories();
+            } catch (e) {
+                console.error('Failed to load categories:', e);
+            }
+        }
+
+        function renderCategories() {
+            const list = document.getElementById('categoriesList');
+            list.innerHTML = categories.map(cat => 
+                `<span class="badge bg-secondary category-badge" onclick="filterByCategory('${cat.slug}')">
+                    ${cat.name}
+                </span>`
+            ).join('');
+        }
+
+        function showCategoryModal() {
+            categoryModal.show();
+        }
+
+        async function createCategory() {
+            const name = document.getElementById('categoryName').value.trim();
+            if (!name) return;
+            
+            try {
+                const response = await fetch('/api/categories', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ name })
+                });
+                
+                if (response.ok) {
+                    categoryModal.hide();
+                    document.getElementById('categoryName').value = '';
+                    loadCategories();
+                }
+            } catch (e) {
+                alert('Failed to create category');
+            }
+        }
+
+        function filterByCategory(slug) {
+            // Simple filter by category (can be enhanced with metadata)
+            alert(`Filter by category: ${slug} (feature can be enhanced with article-category metadata)`);
+        }
+
+        async function loadArticles() {
+            try {
+                // Load articles from reports directory (simplified - in production use API)
+                const articles = await loadArticlesFromReports();
+                allArticles = articles;
+                renderArticles(articles);
+            } catch (e) {
+                console.error('Failed to load articles:', e);
+            }
+        }
+
+        async function loadArticlesFromReports() {
+            // Simplified: parse existing HTML index or fetch articles list
+            // In production, implement proper API endpoint
+            return [
+                {
+                    slug: '2026-02-13-optimization-sprint',
+                    title: 'Night Shift Optimization Report 🌙',
+                    date: '2026-02-13',
+                    author: 'Morty',
+                    excerpt: 'Night Shift Optimization Report 🌙\n\n**Date:** 2026-02-13\n**Time:** 01:50 UTC\n**Author:** Morty\n\n🚀 Status: Mission...',
+                    tags: ['optimization', 'sprint'],
+                    content: 'Full article content for reading time calculation...' // This would be loaded from file
+                },
+                {
+                    slug: '2026-02-12-night-shift',
+                    title: 'Night Shift: Docker & Hooker Status',
+                    date: '2026-02-12',
+                    author: 'Morty',
+                    excerpt: 'Cliper-News: Reports & Thoughts 🧠\n\n2026-02-12 Night Shift Report\n**Author:** Morty\n**Time:** 00:50 UTC\n\nStatus...',
+                    tags: ['status', 'night-shift', 'infrastructure'],
+                    content: 'Full article content...'
+                }
+            ];
+        }
+
+        function calculateReadingTime(content) {
+            const wordsPerMinute = 200;
+            const words = content.split(/\s+/).length;
+            const minutes = Math.ceil(words / wordsPerMinute);
+            return minutes;
+        }
+
+        function renderArticles(articles) {
+            const grid = document.getElementById('articlesGrid');
+            grid.innerHTML = articles.map(article => {
+                const readingTime = calculateReadingTime(article.content || article.excerpt);
+                const tags = article.tags ? article.tags.map(tag => 
+                    `<span class="badge bg-secondary badge-tag">${tag}</span>`
+                ).join(' ') : '';
+                
+                return `
+                    <div class="col-xl-4 col-md-6 mb-4">
+                        <div class="card h-100 report-card">
+                            <div class="card-body">
+                                <div class="d-flex justify-content-between align-items-center mb-3">
+                                    <span class="badge badge-date">${article.date}</span>
+                                    <span class="text-muted small">${article.author}</span>
+                                </div>
+                                <h5 class="card-title mb-3">
+                                    <a href="articles/${article.slug}.html" class="text-decoration-none text-dark stretched-link">
+                                        ${article.title}
+                                    </a>
+                                </h5>
+                                <p class="card-text text-muted small">
+                                    ${article.excerpt.substring(0, 150)}...
+                                </p>
+                                <div class="reading-time">
+                                    <i class="bi bi-clock"></i> ${readingTime} min read
+                                </div>
+                            </div>
+                            <div class="card-footer bg-transparent border-0 d-flex justify-content-between">
+                                <span class="text-muted extra-small">
+                                    <i class="bi bi-tag me-1"></i> ${tags}
+                                </span>
+                            </div>
+                        </div>
+                    </div>
+                `;
+            }).join('');
+        }
+
+        function showView(view) {
+            currentView = view;
+            document.getElementById('dashboardView').style.display = 'none';
+            document.getElementById('timelineView').style.display = 'none';
+            document.getElementById('archiveView').style.display = 'none';
+            document.getElementById('searchResults').style.display = 'none';
+            
+            if (view === 'dashboard') {
+                document.getElementById('dashboardView').style.display = 'block';
+                renderArticles(allArticles);
+            } else if (view === 'timeline') {
+                document.getElementById('timelineView').style.display = 'block';
+                renderTimeline();
+            } else if (view === 'archive') {
+                document.getElementById('archiveView').style.display = 'block';
+                renderArchive();
+            }
+        }
+
+        function renderTimeline() {
+            const timeline = document.getElementById('timelineContent');
+            const sortedArticles = [...allArticles].sort((a, b) => b.date.localeCompare(a.date));
+            
+            timeline.innerHTML = sortedArticles.map(article => `
+                <div class="timeline-item">
+                    <div class="card report-card">
+                        <div class="card-body">
+                            <h6 class="text-muted">${article.date}</h6>
+                            <h5><a href="articles/${article.slug}.html">${article.title}</a></h5>
+                            <p class="mb-0">${article.excerpt.substring(0, 200)}...</p>
+                        </div>
+                    </div>
+                </div>
+            `).join('');
+        }
+
+        function renderArchive() {
+            const archive = document.getElementById('archiveContent');
+            
+            // Group by year and month
+            const grouped = {};
+            allArticles.forEach(article => {
+                const [year, month] = article.date.split('-');
+                const key = `${year}-${month}`;
+                if (!grouped[key]) grouped[key] = [];
+                grouped[key].push(article);
+            });
+            
+            const sortedKeys = Object.keys(grouped).sort().reverse();
+            
+            archive.innerHTML = sortedKeys.map(key => {
+                const [year, month] = key.split('-');
+                const monthName = new Date(year, month - 1).toLocaleString('default', { month: 'long' });
+                
+                return `
+                    <div class="mb-4">
+                        <h4>${monthName} ${year}</h4>
+                        <ul class="list-group">
+                            ${grouped[key].map(article => `
+                                <li class="list-group-item">
+                                    <a href="articles/${article.slug}.html">${article.title}</a>
+                                    <span class="badge bg-secondary float-end">${article.date}</span>
+                                </li>
+                            `).join('')}
+                        </ul>
+                    </div>
+                `;
+            }).join('');
+        }
+
+        async function searchArticles() {
+            const query = document.getElementById('searchInput').value.trim();
+            if (!query) return;
+            
+            try {
+                const response = await fetch(`/api/search?q=${encodeURIComponent(query)}`);
+                const results = await response.json();
+                
+                document.getElementById('dashboardView').style.display = 'none';
+                document.getElementById('timelineView').style.display = 'none';
+                document.getElementById('archiveView').style.display = 'none';
+                document.getElementById('searchResults').style.display = 'block';
+                
+                const resultsContent = document.getElementById('searchResultsContent');
+                if (results.length === 0) {
+                    resultsContent.innerHTML = '<p>No results found.</p>';
+                } else {
+                    resultsContent.innerHTML = results.map(article => `
+                        <div class="card report-card mb-3">
+                            <div class="card-body">
+                                <h5><a href="articles/${article.slug}.html">${article.title}</a></h5>
+                                <p class="text-muted">${article.excerpt}</p>
+                            </div>
+                        </div>
+                    `).join('');
+                }
+            } catch (e) {
+                alert('Search failed');
+            }
+        }
+
+        function updateTimestamp() {
+            const now = new Date();
+            const formatted = now.toISOString().substring(0, 16).replace('T', ' ');
+            document.getElementById('updateTime').textContent = `Updated: ${formatted}`;
+        }
+
+        // Social sharing functions (can be added to article pages)
+        function shareToTwitter(title, url) {
+            window.open(`https://twitter.com/intent/tweet?text=${encodeURIComponent(title)}&url=${encodeURIComponent(url)}`, '_blank');
+        }
+
+        function shareToFacebook(url) {
+            window.open(`https://www.facebook.com/sharer/sharer.php?u=${encodeURIComponent(url)}`, '_blank');
+        }
+
+        function copyLink(url) {
+            navigator.clipboard.writeText(url).then(() => {
+                alert('Link copied to clipboard!');
+            });
+        }
+    </script>
 </body>
 </html>

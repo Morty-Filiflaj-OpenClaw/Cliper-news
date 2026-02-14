@@ -3,124 +3,428 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Article Viewer - Cliper</title>
+    <title>Article - Cliper News</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.0/font/bootstrap-icons.css">
-    <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/dompurify/dist/purify.min.js"></script>
     <style>
         :root {
             --primary-color: #2c3e50;
             --accent-color: #3498db;
         }
-        body { background-color: #f4f7f6; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; }
-        .sidebar { background: var(--primary-color); color: white; min-height: 100vh; }
-        .nav-link { color: #bdc3c7; transition: 0.3s; }
-        .nav-link:hover, .nav-link.active { color: white; background: rgba(255,255,255,0.1); }
-        .content-area { padding: 40px; background: white; min-height: 100vh; border-left: 1px solid #e0e0e0; }
-        .article-content { max-width: 800px; margin: 0 auto; line-height: 1.8; font-size: 1.1em; color: #333; }
-        .article-header { margin-bottom: 40px; border-bottom: 1px solid #eee; padding-bottom: 20px; }
-        .article-title { font-size: 2.5em; font-weight: 700; color: var(--primary-color); }
-        .article-meta { color: #7f8c8d; font-size: 0.9em; margin-top: 10px; }
-        img { max-width: 100%; border-radius: 8px; box-shadow: 0 4px 6px rgba(0,0,0,0.1); margin: 20px 0; }
-        blockquote { border-left: 4px solid var(--accent-color); padding-left: 20px; color: #555; font-style: italic; background: #f9f9f9; padding: 15px; border-radius: 4px; }
-        pre { background: #2d3436; color: #dfe6e9; padding: 15px; border-radius: 5px; overflow-x: auto; }
-        h1, h2, h3 { color: var(--primary-color); margin-top: 1.5em; }
+        
+        body { 
+            background-color: #f4f7f6; 
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            transition: background-color 0.3s, color 0.3s;
+        }
+        
+        body.dark-mode {
+            background-color: #1a1a1a;
+            color: #e0e0e0;
+        }
+        
+        .article-container {
+            max-width: 800px;
+            margin: 40px auto;
+            background: white;
+            padding: 40px;
+            border-radius: 10px;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+        }
+        
+        body.dark-mode .article-container {
+            background: #2d2d2d;
+        }
+        
+        .article-header {
+            border-bottom: 2px solid #e0e0e0;
+            padding-bottom: 20px;
+            margin-bottom: 30px;
+        }
+        
+        body.dark-mode .article-header {
+            border-bottom-color: #3d3d3d;
+        }
+        
+        .article-meta {
+            color: #6c757d;
+            font-size: 0.9em;
+            margin-top: 10px;
+        }
+        
+        .article-content {
+            line-height: 1.8;
+            font-size: 1.1em;
+        }
+        
+        .article-content img {
+            max-width: 100%;
+            height: auto;
+            border-radius: 5px;
+            margin: 20px 0;
+        }
+        
+        .social-share {
+            display: flex;
+            gap: 10px;
+            margin: 30px 0;
+            padding: 20px;
+            background: #f8f9fa;
+            border-radius: 8px;
+        }
+        
+        body.dark-mode .social-share {
+            background: #3d3d3d;
+        }
+        
+        .share-btn {
+            padding: 8px 20px;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 0.9em;
+            transition: 0.3s;
+            text-decoration: none;
+            display: inline-flex;
+            align-items: center;
+            gap: 5px;
+        }
+        
+        .share-btn:hover { opacity: 0.8; }
+        .share-twitter { background: #1DA1F2; color: white; }
+        .share-facebook { background: #4267B2; color: white; }
+        .share-copy { background: #6c757d; color: white; }
+        
+        .related-articles {
+            background: #f8f9fa;
+            padding: 25px;
+            border-radius: 8px;
+            margin-top: 40px;
+        }
+        
+        body.dark-mode .related-articles {
+            background: #3d3d3d;
+        }
+        
+        .related-article-item {
+            padding: 10px;
+            margin-bottom: 10px;
+            border-left: 3px solid var(--accent-color);
+            background: white;
+            border-radius: 5px;
+        }
+        
+        body.dark-mode .related-article-item {
+            background: #2d2d2d;
+        }
+        
+        .comments-section {
+            margin-top: 50px;
+            padding-top: 30px;
+            border-top: 2px solid #e0e0e0;
+        }
+        
+        body.dark-mode .comments-section {
+            border-top-color: #3d3d3d;
+        }
+        
+        .comment {
+            background: #f8f9fa;
+            padding: 15px;
+            border-radius: 8px;
+            margin-bottom: 15px;
+        }
+        
+        body.dark-mode .comment {
+            background: #3d3d3d;
+        }
+        
+        .comment-author {
+            font-weight: bold;
+            color: var(--accent-color);
+        }
+        
+        .comment-date {
+            font-size: 0.85em;
+            color: #6c757d;
+        }
+        
+        body.dark-mode .form-control,
+        body.dark-mode .form-control:focus {
+            background: #3d3d3d;
+            color: #e0e0e0;
+            border-color: #4d4d4d;
+        }
+        
+        .reading-time {
+            display: inline-block;
+            padding: 5px 15px;
+            background: var(--accent-color);
+            color: white;
+            border-radius: 20px;
+            font-size: 0.85em;
+            margin-left: 15px;
+        }
+        
+        .version-history-btn {
+            float: right;
+        }
     </style>
 </head>
 <body>
-    <div class="container-fluid">
-        <div class="row">
-            <!-- Sidebar -->
-            <nav class="col-md-2 d-none d-md-block sidebar p-3">
-                <div class="text-center mb-4">
-                    <h3 class="mt-2">🗞️ Cliper</h3>
-                    <p class="text-muted small">News & Reports</p>
-                </div>
-                <ul class="nav flex-column">
-                    <li class="nav-item mb-2">
-                        <a class="nav-link" href="index.html">
-                            <i class="bi bi-speedometer2 me-2"></i> Dashboard
-                        </a>
-                    </li>
-                    <li class="nav-item mb-2">
-                        <a class="nav-link active" href="new_article.html">
-                            <i class="bi bi-pencil-square me-2"></i> New Article
-                        </a>
-                    </li>
-                </ul>
-            </nav>
-
-            <!-- Main Content -->
-            <main class="col-md-10 ms-sm-auto px-0">
-                <div class="content-area">
-                    <div id="loading" class="text-center py-5">
-                        <div class="spinner-border text-primary" role="status">
-                            <span class="visually-hidden">Loading...</span>
+    <div class="container">
+        <div class="article-container">
+            <!-- Article Header -->
+            <div class="article-header">
+                <div class="d-flex justify-content-between align-items-start">
+                    <div>
+                        <h1 id="articleTitle">Loading...</h1>
+                        <div class="article-meta">
+                            <span id="articleDate"></span> • 
+                            <span id="articleAuthor"></span>
+                            <span class="reading-time" id="readingTime">
+                                <i class="bi bi-clock"></i> 0 min read
+                            </span>
                         </div>
                     </div>
-                    
-                    <div id="article-container" class="article-content" style="display: none;">
-                        <div class="article-header">
-                            <h1 id="article-title" class="article-title"></h1>
-                            <div class="article-meta">
-                                <span id="article-date"><i class="bi bi-calendar3"></i> </span>
-                                <span id="article-author" class="ms-3"><i class="bi bi-person"></i> </span>
+                    <div>
+                        <button class="btn btn-sm btn-outline-secondary me-2" onclick="toggleDarkMode()">
+                            <i class="bi bi-moon-stars"></i>
+                        </button>
+                        <button class="btn btn-sm btn-outline-secondary version-history-btn" onclick="showVersions()">
+                            <i class="bi bi-clock-history"></i>
+                        </button>
+                    </div>
+                </div>
+                <div id="articleTags" class="mt-3"></div>
+            </div>
+            
+            <!-- Article Content -->
+            <div class="article-content" id="articleContent">
+                <p>Loading article...</p>
+            </div>
+            
+            <!-- Social Share -->
+            <div class="social-share">
+                <strong>Share:</strong>
+                <button class="share-btn share-twitter" onclick="shareTwitter()">
+                    <i class="bi bi-twitter"></i> Twitter
+                </button>
+                <button class="share-btn share-facebook" onclick="shareFacebook()">
+                    <i class="bi bi-facebook"></i> Facebook
+                </button>
+                <button class="share-btn share-copy" onclick="copyLink()">
+                    <i class="bi bi-link-45deg"></i> Copy Link
+                </button>
+            </div>
+            
+            <!-- Related Articles -->
+            <div class="related-articles">
+                <h5><i class="bi bi-collection"></i> Related Articles</h5>
+                <div id="relatedArticles">
+                    <p class="text-muted">Loading...</p>
+                </div>
+            </div>
+            
+            <!-- Comments Section -->
+            <div class="comments-section">
+                <h4><i class="bi bi-chat-left-text"></i> Comments</h4>
+                
+                <div id="commentsList"></div>
+                
+                <!-- Add Comment Form -->
+                <div class="card mt-4">
+                    <div class="card-body">
+                        <h6>Leave a Comment</h6>
+                        <form id="commentForm">
+                            <div class="mb-3">
+                                <input type="text" class="form-control" id="commentAuthor" 
+                                       placeholder="Your name" required>
                             </div>
-                        </div>
-                        <div id="markdown-output"></div>
+                            <div class="mb-3">
+                                <textarea class="form-control" id="commentContent" rows="3" 
+                                          placeholder="Your comment..." required></textarea>
+                            </div>
+                            <button type="submit" class="btn btn-primary">
+                                <i class="bi bi-send"></i> Post Comment
+                            </button>
+                        </form>
                     </div>
                 </div>
-            </main>
+            </div>
+            
+            <div class="text-center mt-4">
+                <a href="../index.html" class="btn btn-outline-primary">
+                    <i class="bi bi-arrow-left"></i> Back to Home
+                </a>
+            </div>
         </div>
     </div>
 
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
     <script>
-        const params = new URLSearchParams(window.location.search);
-        const file = params.get('file');
+        let articleSlug = '';
+        let articleTitle = '';
 
-        if (!file) {
-            document.getElementById('loading').innerHTML = '<div class="alert alert-danger">No file specified</div>';
-        } else {
-            fetch(file)
-                .then(response => {
-                    if (!response.ok) throw new Error("File not found");
-                    return response.text();
-                })
-                .then(text => {
-                    // Extract frontmatter
-                    let content = text;
-                    let metadata = {};
-                    
-                    const fmMatch = text.match(/^---\s*\n([\s\S]*?)\n---\s*\n/);
-                    if (fmMatch) {
-                        content = text.substring(fmMatch[0].length);
-                        // Simple YAML parser for title/date/author
-                        fmMatch[1].split('\n').forEach(line => {
-                            const parts = line.split(':');
-                            if (parts.length >= 2) {
-                                const key = parts[0].trim();
-                                const value = parts.slice(1).join(':').trim();
-                                metadata[key] = value;
-                            }
-                        });
-                    }
+        document.addEventListener('DOMContentLoaded', () => {
+            // Load dark mode
+            if (localStorage.getItem('cliperDarkMode') === 'true') {
+                document.body.classList.add('dark-mode');
+            }
+            
+            // Extract article slug from URL
+            const path = window.location.pathname;
+            articleSlug = path.split('/').pop().replace('.html', '');
+            
+            loadArticle();
+            loadComments();
+            loadRelatedArticles();
+        });
 
-                    // Render
-                    document.getElementById('article-title').textContent = metadata.title || 'Untitled';
-                    document.getElementById('article-date').innerHTML += metadata.date || 'Unknown Date';
-                    document.getElementById('article-author').innerHTML += metadata.author || 'Unknown Author';
-                    
-                    // Render markdown
-                    const html = DOMPurify.sanitize(marked.parse(content));
-                    document.getElementById('markdown-output').innerHTML = html;
-                    
-                    document.getElementById('loading').style.display = 'none';
-                    document.getElementById('article-container').style.display = 'block';
-                })
-                .catch(err => {
-                    document.getElementById('loading').innerHTML = `<div class="alert alert-danger">Error loading article: ${err.message}</div>`;
+        function toggleDarkMode() {
+            document.body.classList.toggle('dark-mode');
+            localStorage.setItem('cliperDarkMode', document.body.classList.contains('dark-mode'));
+        }
+
+        async function loadArticle() {
+            // In a real implementation, this would fetch from API
+            // For now, we'll parse the current page if it has embedded data
+            // or make an API call to get article metadata
+            
+            // Placeholder: extract from filename
+            articleTitle = articleSlug.replace(/-/g, ' ').replace(/^\d{4} \d{2} \d{2}\s/, '');
+            document.getElementById('articleTitle').textContent = articleTitle;
+            
+            // Set metadata (would come from API in production)
+            document.getElementById('articleDate').textContent = articleSlug.substring(0, 10);
+            document.getElementById('articleAuthor').textContent = 'Morty';
+            
+            // Calculate reading time from content
+            const content = document.getElementById('articleContent').textContent;
+            const words = content.split(/\s+/).length;
+            const minutes = Math.ceil(words / 200);
+            document.getElementById('readingTime').innerHTML = 
+                `<i class="bi bi-clock"></i> ${minutes} min read`;
+        }
+
+        async function loadComments() {
+            try {
+                const response = await fetch(`/api/comments/${articleSlug}`);
+                const comments = await response.json();
+                
+                const list = document.getElementById('commentsList');
+                if (comments.length === 0) {
+                    list.innerHTML = '<p class="text-muted">No comments yet. Be the first!</p>';
+                } else {
+                    list.innerHTML = comments.map(c => `
+                        <div class="comment">
+                            <div class="d-flex justify-content-between">
+                                <span class="comment-author">${c.author}</span>
+                                <span class="comment-date">${new Date(c.created_at).toLocaleString()}</span>
+                            </div>
+                            <div class="mt-2">${c.content}</div>
+                        </div>
+                    `).join('');
+                }
+            } catch (e) {
+                console.error('Failed to load comments:', e);
+            }
+        }
+
+        async function loadRelatedArticles() {
+            try {
+                const response = await fetch(`/api/related/${articleSlug}`);
+                const articles = await response.json();
+                
+                const container = document.getElementById('relatedArticles');
+                if (articles.length === 0) {
+                    container.innerHTML = '<p class="text-muted">No related articles found.</p>';
+                } else {
+                    container.innerHTML = articles.map(a => `
+                        <div class="related-article-item">
+                            <a href="${a.slug}.html">${a.title}</a>
+                        </div>
+                    `).join('');
+                }
+            } catch (e) {
+                console.error('Failed to load related articles:', e);
+            }
+        }
+
+        document.getElementById('commentForm').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            
+            const author = document.getElementById('commentAuthor').value;
+            const content = document.getElementById('commentContent').value;
+            
+            try {
+                const response = await fetch('/api/comments', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        article_slug: articleSlug,
+                        author: author,
+                        content: content
+                    })
                 });
+                
+                if (response.ok) {
+                    document.getElementById('commentAuthor').value = '';
+                    document.getElementById('commentContent').value = '';
+                    loadComments();
+                    alert('Comment posted!');
+                } else {
+                    alert('Failed to post comment');
+                }
+            } catch (e) {
+                alert('Error posting comment');
+            }
+        });
+
+        function shareTwitter() {
+            const url = window.location.href;
+            const text = articleTitle;
+            window.open(`https://twitter.com/intent/tweet?text=${encodeURIComponent(text)}&url=${encodeURIComponent(url)}`, '_blank');
+        }
+
+        function shareFacebook() {
+            const url = window.location.href;
+            window.open(`https://www.facebook.com/sharer/sharer.php?u=${encodeURIComponent(url)}`, '_blank');
+        }
+
+        function copyLink() {
+            const url = window.location.href;
+            navigator.clipboard.writeText(url).then(() => {
+                alert('Link copied to clipboard!');
+            }).catch(() => {
+                // Fallback for older browsers
+                const input = document.createElement('input');
+                input.value = url;
+                document.body.appendChild(input);
+                input.select();
+                document.execCommand('copy');
+                document.body.removeChild(input);
+                alert('Link copied!');
+            });
+        }
+
+        async function showVersions() {
+            try {
+                const response = await fetch(`/api/versions/${articleSlug}`);
+                const versions = await response.json();
+                
+                if (versions.length === 0) {
+                    alert('No version history available');
+                } else {
+                    let message = 'Version History:\n\n';
+                    versions.forEach(v => {
+                        message += `Version ${v.version} - ${v.created_at}\n`;
+                    });
+                    alert(message);
+                }
+            } catch (e) {
+                alert('Failed to load version history');
+            }
         }
     </script>
 </body>

@@ -5,38 +5,376 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>New Article - Cliper News</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.0/font/bootstrap-icons.css">
     <style>
-        body { background-color: #f4f7f6; padding: 20px; }
-        .editor-container { background: white; padding: 30px; border-radius: 10px; box-shadow: 0 4px 6px rgba(0,0,0,0.1); }
+        body { 
+            background-color: #f4f7f6; 
+            padding: 20px; 
+            transition: background-color 0.3s, color 0.3s;
+        }
+        
+        body.dark-mode {
+            background-color: #1a1a1a;
+            color: #e0e0e0;
+        }
+        
+        .editor-container { 
+            background: white; 
+            padding: 30px; 
+            border-radius: 10px; 
+            box-shadow: 0 4px 6px rgba(0,0,0,0.1); 
+        }
+        
+        body.dark-mode .editor-container {
+            background: #2d2d2d;
+        }
+        
+        body.dark-mode .form-control,
+        body.dark-mode .form-select {
+            background: #3d3d3d;
+            color: #e0e0e0;
+            border-color: #4d4d4d;
+        }
+        
+        .upload-preview {
+            max-width: 200px;
+            max-height: 200px;
+            margin-top: 10px;
+            border-radius: 5px;
+        }
+        
+        .image-gallery {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
+            margin-top: 10px;
+        }
+        
+        .image-item {
+            position: relative;
+            width: 100px;
+            height: 100px;
+            border: 2px solid #ddd;
+            border-radius: 5px;
+            overflow: hidden;
+            cursor: pointer;
+        }
+        
+        .image-item img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+        
+        .image-item:hover {
+            border-color: #3498db;
+        }
+        
+        .versions-list {
+            max-height: 300px;
+            overflow-y: auto;
+        }
     </style>
 </head>
 <body>
     <div class="container editor-container">
-        <h2>Write New Article</h2>
+        <div class="d-flex justify-content-between align-items-center mb-4">
+            <h2>
+                <i class="bi bi-pencil-square"></i> Write New Article
+            </h2>
+            <div>
+                <button class="btn btn-sm btn-outline-secondary" onclick="toggleDarkMode()">
+                    <i class="bi bi-moon-stars"></i>
+                </button>
+                <button class="btn btn-sm btn-outline-secondary" onclick="showVersionHistory()">
+                    <i class="bi bi-clock-history"></i> History
+                </button>
+            </div>
+        </div>
+        
         <form id="articleForm">
+            <!-- Title -->
             <div class="mb-3">
                 <label for="title" class="form-label">Title</label>
                 <input type="text" class="form-control" id="title" required>
             </div>
-            <div class="mb-3">
-                <label for="filename" class="form-label">Filename (optional, without extension)</label>
-                <input type="text" class="form-control" id="filename" placeholder="e.g., my-awesome-post">
+            
+            <div class="row mb-3">
+                <!-- Filename -->
+                <div class="col-md-6">
+                    <label for="filename" class="form-label">Filename (optional)</label>
+                    <input type="text" class="form-control" id="filename" placeholder="auto-generated from title">
+                </div>
+                
+                <!-- Category -->
+                <div class="col-md-6">
+                    <label for="category" class="form-label">Category</label>
+                    <select class="form-select" id="category">
+                        <option value="">No Category</option>
+                    </select>
+                </div>
             </div>
+            
+            <!-- Author & Tags -->
+            <div class="row mb-3">
+                <div class="col-md-6">
+                    <label for="author" class="form-label">Author</label>
+                    <input type="text" class="form-control" id="author" value="Morty">
+                </div>
+                
+                <div class="col-md-6">
+                    <label for="tags" class="form-label">Tags (comma separated)</label>
+                    <input type="text" class="form-control" id="tags" placeholder="tech, news, update">
+                </div>
+            </div>
+            
+            <!-- Image Upload -->
+            <div class="mb-3">
+                <label for="imageUpload" class="form-label">
+                    <i class="bi bi-image"></i> Upload Images
+                </label>
+                <input type="file" class="form-control" id="imageUpload" accept="image/*" onchange="handleImageUpload(event)">
+                <small class="text-muted">Upload images to use in your article</small>
+                <div class="image-gallery" id="imageGallery"></div>
+            </div>
+            
+            <!-- Content Editor -->
             <div class="mb-3">
                 <label for="content" class="form-label">Content (Markdown)</label>
                 <textarea class="form-control" id="content" rows="15" required></textarea>
+                <small class="text-muted">
+                    Supports Markdown. <a href="#" onclick="insertTemplate(); return false;">Insert template</a>
+                </small>
             </div>
-            <button type="submit" class="btn btn-primary">Save Article</button>
-            <a href="index.html" class="btn btn-secondary">Cancel</a>
+            
+            <!-- Preview Reading Time -->
+            <div class="mb-3">
+                <div class="alert alert-info">
+                    <i class="bi bi-clock"></i> 
+                    Estimated reading time: <strong id="readingTime">0 min</strong>
+                </div>
+            </div>
+            
+            <!-- Actions -->
+            <div class="d-flex gap-2">
+                <button type="submit" class="btn btn-primary">
+                    <i class="bi bi-save"></i> Save Article
+                </button>
+                <button type="button" class="btn btn-outline-secondary" onclick="saveDraft()">
+                    <i class="bi bi-file-earmark"></i> Save Draft
+                </button>
+                <a href="index.html" class="btn btn-secondary">Cancel</a>
+            </div>
         </form>
     </div>
 
+    <!-- Version History Modal -->
+    <div class="modal fade" id="versionModal" tabindex="-1">
+        <div class="modal-dialog modal-lg">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">Version History</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body">
+                    <div class="versions-list" id="versionsList">
+                        <p class="text-muted">No previous versions</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
     <script>
+        let uploadedImages = [];
+        let versionModal;
+
+        document.addEventListener('DOMContentLoaded', () => {
+            // Load dark mode
+            if (localStorage.getItem('cliperDarkMode') === 'true') {
+                document.body.classList.add('dark-mode');
+            }
+            
+            versionModal = new bootstrap.Modal(document.getElementById('versionModal'));
+            
+            loadCategories();
+            
+            // Calculate reading time on content change
+            document.getElementById('content').addEventListener('input', updateReadingTime);
+            
+            // Load draft if exists
+            loadDraft();
+        });
+
+        function toggleDarkMode() {
+            document.body.classList.toggle('dark-mode');
+            localStorage.setItem('cliperDarkMode', document.body.classList.contains('dark-mode'));
+        }
+
+        async function loadCategories() {
+            try {
+                const response = await fetch('/api/categories');
+                const categories = await response.json();
+                
+                const select = document.getElementById('category');
+                categories.forEach(cat => {
+                    const option = document.createElement('option');
+                    option.value = cat.id;
+                    option.textContent = cat.name;
+                    select.appendChild(option);
+                });
+            } catch (e) {
+                console.error('Failed to load categories:', e);
+            }
+        }
+
+        async function handleImageUpload(event) {
+            const file = event.target.files[0];
+            if (!file) return;
+            
+            const formData = new FormData();
+            formData.append('image', file);
+            
+            try {
+                const response = await fetch('/api/upload', {
+                    method: 'POST',
+                    body: formData
+                });
+                
+                if (response.ok) {
+                    const data = await response.json();
+                    uploadedImages.push(data.url);
+                    renderImageGallery();
+                    alert('Image uploaded! Click on it to insert into article.');
+                } else {
+                    alert('Upload failed');
+                }
+            } catch (e) {
+                alert('Upload error: ' + e.message);
+            }
+        }
+
+        function renderImageGallery() {
+            const gallery = document.getElementById('imageGallery');
+            gallery.innerHTML = uploadedImages.map(url => `
+                <div class="image-item" onclick="insertImage('${url}')">
+                    <img src="${url}" alt="Uploaded image">
+                </div>
+            `).join('');
+        }
+
+        function insertImage(url) {
+            const content = document.getElementById('content');
+            const imageMarkdown = `\n![Image](${url})\n`;
+            content.value += imageMarkdown;
+            updateReadingTime();
+        }
+
+        function insertTemplate() {
+            const template = `# Title Here
+
+## Introduction
+Brief introduction...
+
+## Main Content
+Your content here...
+
+## Conclusion
+Summary and closing thoughts...
+
+---
+*Tags: tag1, tag2, tag3*`;
+            
+            document.getElementById('content').value = template;
+            updateReadingTime();
+        }
+
+        function updateReadingTime() {
+            const content = document.getElementById('content').value;
+            const words = content.split(/\s+/).filter(w => w.length > 0).length;
+            const minutes = Math.ceil(words / 200);
+            document.getElementById('readingTime').textContent = `${minutes} min`;
+        }
+
+        function saveDraft() {
+            const draft = {
+                title: document.getElementById('title').value,
+                filename: document.getElementById('filename').value,
+                author: document.getElementById('author').value,
+                tags: document.getElementById('tags').value,
+                category: document.getElementById('category').value,
+                content: document.getElementById('content').value
+            };
+            
+            localStorage.setItem('cliper_draft', JSON.stringify(draft));
+            alert('Draft saved locally!');
+        }
+
+        function loadDraft() {
+            const draft = localStorage.getItem('cliper_draft');
+            if (!draft) return;
+            
+            if (confirm('Load saved draft?')) {
+                const data = JSON.parse(draft);
+                document.getElementById('title').value = data.title || '';
+                document.getElementById('filename').value = data.filename || '';
+                document.getElementById('author').value = data.author || 'Morty';
+                document.getElementById('tags').value = data.tags || '';
+                document.getElementById('category').value = data.category || '';
+                document.getElementById('content').value = data.content || '';
+                updateReadingTime();
+            }
+        }
+
+        async function showVersionHistory() {
+            const filename = document.getElementById('filename').value;
+            if (!filename) {
+                alert('Enter filename first to view history');
+                return;
+            }
+            
+            try {
+                const response = await fetch(`/api/versions/${filename}`);
+                const versions = await response.json();
+                
+                const list = document.getElementById('versionsList');
+                if (versions.length === 0) {
+                    list.innerHTML = '<p class="text-muted">No previous versions</p>';
+                } else {
+                    list.innerHTML = versions.map(v => `
+                        <div class="card mb-2">
+                            <div class="card-body">
+                                <h6>Version ${v.version}</h6>
+                                <small class="text-muted">${v.created_at}</small>
+                                <button class="btn btn-sm btn-outline-primary float-end" 
+                                        onclick="restoreVersion(${v.id})">
+                                    Restore
+                                </button>
+                            </div>
+                        </div>
+                    `).join('');
+                }
+                
+                versionModal.show();
+            } catch (e) {
+                alert('Failed to load versions');
+            }
+        }
+
+        function restoreVersion(versionId) {
+            alert('Version restore functionality can be implemented by fetching version content');
+        }
+
         document.getElementById('articleForm').addEventListener('submit', async (e) => {
             e.preventDefault();
+            
             const title = document.getElementById('title').value;
             let filename = document.getElementById('filename').value;
             const content = document.getElementById('content').value;
+            const author = document.getElementById('author').value;
+            const tags = document.getElementById('tags').value;
+            const categoryId = document.getElementById('category').value;
 
             if (!filename) {
                 // Generate filename from title
@@ -48,10 +386,12 @@
             // Prepend frontmatter if missing
             let fullContent = content;
             if (!content.startsWith('---')) {
+                const tagList = tags.split(',').map(t => t.trim()).filter(t => t);
                 fullContent = `---
 title: ${title}
 date: ${new Date().toISOString().split('T')[0]}
-author: WebUser
+author: ${author}
+tags: [${tagList.join(', ')}]
 ---
 
 ${content}`;
@@ -61,10 +401,16 @@ ${content}`;
                 const response = await fetch('/api/save', {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ filename, content: fullContent })
+                    body: JSON.stringify({ 
+                        filename, 
+                        content: fullContent,
+                        category_id: categoryId || null
+                    })
                 });
 
                 if (response.ok) {
+                    // Clear draft
+                    localStorage.removeItem('cliper_draft');
                     alert('Article saved!');
                     window.location.href = 'index.html';
                 } else {
